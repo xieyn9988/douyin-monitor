@@ -1,0 +1,12 @@
+# docker-compose.yml
+version: '3.8'
+services:
+  monitor:
+    build: .
+    environment:
+      - FEISHU_WEBHOOK=${FEISHU_WEBHOOK}
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./audio_cache:/app/audio_cache
+    restart: unless-stopped
