@@ -88,14 +88,15 @@
 
 ---
 
-## 项目结构
+## 📂 项目结构
+
 ```text
 douyin-monitor/
 ├── src/
+│   ├── __init__.py
 │   ├── collector/              # 采集模块
 │   │   ├── __init__.py
-│   │   ├── browser.py          # Playwright 浏览器管理
-│   │   └── douyin.py           # 抖音页面操作
+│   │   └── douyin.py           # 抖音页面操作 + 浏览器管理
 │   ├── processor/              # 处理模块
 │   │   ├── __init__.py
 │   │   ├── audio.py            # FFmpeg 音频提取
@@ -108,22 +109,22 @@ douyin-monitor/
 │   │   ├── __init__.py
 │   │   └── tasks.py            # 定时任务与重试
 │   └── utils/                  # 工具模块
-│   │   ├── __init__.py
-│   │   ├── logger.py           # 日志配置
-│   │   └── alert.py            # 告警通知
-│   └── docs/                   # 其他模块
-│       └── debug_page.png      # 反爬截图
-├── data/                       # 数据目录（自动生成）
-├── logs/                       # 日志目录（自动生成）
-├── tests/                      # 测试脚本
-├── main.py                     # 主入口
-├── Dockerfile                  # Docker 构建文件
-├── docker-compose.yml          # Docker Compose 配置
-├── requirements.txt            # Python 依赖
-└── README.md                   # 项目说明文档
-
----
+│       ├── __init__.py
+│       ├── logger.py           # 日志配置
+│       └── alert.py            # 告警通知
+├── docs/
+│   └── debug_page.png
+├── data/
+├── logs/
+├── tests/
+├── main.py
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+├── LICENSE
+└── README.md
 ```
+
 ## 快速开始
 
 ### 环境要求
