@@ -74,7 +74,7 @@
 ---
 
 ## 项目结构
-
+"""
 douyin-monitor/
 ├── src/
 │   ├── collector/              # 采集模块
@@ -106,7 +106,7 @@ douyin-monitor/
 └── README.md                   # 项目说明文档
 
 ---
-
+"""
 ## 快速开始
 
 ### 环境要求
