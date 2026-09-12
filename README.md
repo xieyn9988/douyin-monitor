@@ -264,7 +264,7 @@ douyin-monitor/
 
 ![抖音反爬](docs/debug_page.png)
 
-  **后续解决方案**：
+  *--后续解决方案--*：
   - 使用 `playwright-stealth` 降低浏览器指纹特征
   - 使用代理 IP 池轮换请求
   - 加入人类行为模拟（随机鼠标移动、滚动）
