@@ -98,6 +98,7 @@ print(result)
 pytest test_*.py -v
 
 运行截图
+<img width="1280" height="720" alt="test_douyin_page" src="https://github.com/user-attachments/assets/6e94c29a-3f1f-48e6-9e4e-62dd09d2770a" />
 
 
 ⚠️ 免责声明
