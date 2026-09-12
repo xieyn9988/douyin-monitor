@@ -1,6 +1,7 @@
 # 抖音热点监控 Agent
 
-> 一个基于 AI Coding 工具快速搭建的抖音数据采集与监控系统，用于公司内部音乐营销决策支持。
+> 一个基于 Playwright + FFmpeg 的抖音内容采集与智能分析系统，用于音乐营销决策支持。
+
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![Playwright](https://img.shields.io/badge/Playwright-1.40%2B-green)
@@ -33,7 +34,7 @@
 
 本项目是一个抖音热点监控 Agent，旨在自动监控指定抖音账号的短视频内容，提取热点信息，进行结构化存储，为公司的音乐营销决策提供数据支持。
 
-项目采用 "AI 辅助开发 + 人工审核调试" 的模式，在 20 小时内完成了从零到可运行原型的搭建，核心链路（采集 → 存储 → 日志）已全部打通。
+项目采用模块化架构设计，覆盖采集 → 处理 → 存储 → 调度 → 告警全链路，具备生产级工程实践。
 
 ### 核心价值
 
@@ -124,7 +125,7 @@ douyin-monitor/
 
 第一步，克隆项目：
 
-    git clone <your-repo-url>
+    git clone https://github.com/xieyn9988/douyin-monitor.git
     cd douyin-monitor
 
 第二步，安装 Python 依赖：
@@ -246,9 +247,9 @@ douyin-monitor/
 | 阶段 | 内容 | 状态 |
 |------|------|------|
 | Phase 1 | 项目骨架 + 采集核心 + 数据库 | 已完成 |
-| Phase 2 | FFmpeg 音视频处理 + 内容分析 | 进行中 |
-| Phase 3 | 调度 + 重试 + 日志告警 | 待开始 |
-| Phase 4 | Docker 部署 + 文档完善 | 待开始 |
+| Phase 2 | FFmpeg 音视频处理 + 内容分析 | 已完成 |
+| Phase 3 | 调度 + 重试 + 日志告警 | 已完成 |
+| Phase 4 | Docker 部署 + 文档完善 | 已完成 |
 
 ---
 
