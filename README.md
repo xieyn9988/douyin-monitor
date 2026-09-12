@@ -1,128 +1,64 @@
-# 抖音视频监控工具
+# 抖音热点监控 Agent
 
-> 基于 Playwright 的抖音视频数据采集与监控工具
+> 一个基于 AI Coding 工具快速搭建的抖音数据采集与监控系统，用于公司内部音乐营销决策支持。
 
-## 📖 项目简介
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![Playwright](https://img.shields.io/badge/Playwright-1.40%2B-green)
+![SQLite](https://img.shields.io/badge/SQLite-3.0%2B-orange)
+![Docker](https://img.shields.io/badge/Docker-24.0%2B-blue)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 
-在做短视频数据分析时，需要定期获取抖音视频的公开数据（标题、点赞数、评论数等）。手动采集效率低且容易遗漏，因此开发了这个自动化监控工具。
+---
 
-本项目使用 Playwright 模拟浏览器行为，能够处理抖音页面的动态加载内容，并将采集到的数据保存到本地，方便后续分析。
+## 目录
 
-## ✨ 功能特性
+- [项目简介](#项目简介)
+- [系统架构](#系统架构)
+- [模块职责](#模块职责)
+- [项目结构](#项目结构)
+- [快速开始](#快速开始)
+- [测试验证](#测试验证)
+- [数据库设计](#数据库设计)
+- [核心实现细节](#核心实现细节)
+- [Docker 部署](#docker-部署)
+- [项目进展](#项目进展)
+- [已知限制](#已知限制)
+- [技术栈](#技术栈)
+- [开发日志](#开发日志)
+- [许可证](#许可证)
+- [联系方式](#联系方式)
 
-- 🔍 自动访问指定抖音视频页面
-- 📊 提取视频标题、点赞数、评论数、发布时间等公开数据
-- 💾 数据保存为 JSON / CSV 格式
-- ⏰ 支持定时监控，检测数据变化
-- 🐳 提供 Docker 部署方案
-- ✅ 包含完整的测试用例
+---
 
-## 🛠️ 技术栈
+## 项目简介
 
-| 类别 | 技术 |
-|------|------|
-| 语言 | Python 3.11 |
-| 浏览器自动化 | Playwright 1.62 |
-| 测试框架 | Pytest + pytest-asyncio |
-| 环境管理 | python-dotenv |
-| 网络请求 | Requests |
-| 容器化 | Docker + Docker Compose |
+本项目是一个**抖音热点监控 Agent**，旨在自动监控指定抖音账号的短视频内容，提取热点信息，进行结构化存储，为公司的音乐营销决策提供数据支持。
 
-## 📁 项目结构
-douyin-monitor/
-├── src/ # 源代码
-├── data/ # 数据存储目录
-├── logs/ # 日志目录
-├── main.py # 主入口
-├── test_browser.py # 浏览器测试
-├── test_db.py # 数据库测试
-├── test_douyin.py # 抖音采集测试
-├── test_phase1.py # 阶段测试
-├── test_douyin_page.png # 运行截图
-├── docker-compose.yml # Docker 编排配置
-├── Dockerfile # Docker 镜像配置
-├── requirements.txt # 依赖列表
-├── .env.example # 环境变量示例
-├── .gitignore # Git 忽略规则
-└── README.md # 项目说明
+项目采用 **"AI 辅助开发 + 人工审核调试"** 的模式，在 **20 小时内**完成了从零到可运行原型的搭建，核心链路（采集 → 存储 → 日志）已全部打通。
 
+### 核心价值
 
-## 🚀 快速开始
+- **自动化采集**：无需人工手动翻看抖音，程序自动定时采集指定账号的最新视频
+- **结构化存储**：将采集到的视频信息存入 SQLite 数据库，方便后续查询和分析
+- **工程化保障**：具备日志记录、异常捕获、重试机制等生产级工程实践
+- **容器化部署**：提供 Docker 支持，一键部署，环境一致
 
-### 环境要求
+---
 
-- Python 3.10+
-- Windows / macOS / Linux
-- （可选）Docker
+## 系统架构
 
-### 安装步骤
+```mermaid
+graph TD
+    A[调度器 Scheduler] -->|定时触发| B[采集模块 Collector]
+    B -->|Playwright 浏览器自动化| C[抖音页面]
+    C -->|提取视频信息| D[处理模块 Processor]
+    D -->|FFmpeg 音频提取| E[存储模块 Storage]
+    E -->|SQLite 数据库| F[(videos.db)]
+    E -->|日志记录| G[日志模块 Logger]
+    G -->|异常告警| H[告警模块 Alert]
 
-```bash
-# 1. 克隆仓库
-git clone https://github.com/xieyn9988/douyin-monitor.git
-cd douyin-monitor
-
-# 2. 创建虚拟环境
-python -m venv venv
-
-# Windows 激活
-venv\Scripts\activate
-
-# macOS/Linux 激活
-source venv/bin/activate
-
-# 3. 安装依赖
-pip install -r requirements.txt
-
-# 4. 安装 Playwright 浏览器
-playwright install chromium
-
-# 5. 配置环境变量
-cp .env.example .env
-# 编辑 .env 填入你的配置
-
-# 6. 运行
-python main.py
-
-使用 Docker 运行
-docker-compose up -d
-
-使用示例
-from src.scraper import DouyinMonitor
-
-monitor = DouyinMonitor()
-result = monitor.check("https://www.douyin.com/video/xxxxx")
-print(result)
-
-运行测试
-pytest test_*.py -v
-
-运行截图
-<img width="1280" height="720" alt="test_douyin_page" src="https://github.com/user-attachments/assets/6e94c29a-3f1f-48e6-9e4e-62dd09d2770a" />
-
-
-⚠️ 免责声明
-本项目仅供学习研究使用
-
-请遵守抖音用户协议和 Robots 协议
-
-禁止用于商业用途或大规模数据采集
-
-使用前请自行评估法律风险
-
-
-📈 后续计划
-□ 支持多视频批量监控
-□ 添加数据可视化面板
-□ 支持导出 Excel 报告
-□ 增加更多反爬策略
-👤 作者
-谢鹰
-
-求职方向：Python 开发 / 数据分析
-
-GitHub: @xieying
-
-邮箱: 420309519@qq.com
-
-⭐ 如果这个项目对你有帮助，欢迎 Star！
+    style A fill:#e1f5fe
+    style B fill:#fff3e0
+    style D fill:#f3e5f5
+    style E fill:#e8f5e9
+    style G fill:#fce4ec
