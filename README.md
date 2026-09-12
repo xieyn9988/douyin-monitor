@@ -108,9 +108,11 @@ douyin-monitor/
 │   │   ├── __init__.py
 │   │   └── tasks.py            # 定时任务与重试
 │   └── utils/                  # 工具模块
-│       ├── __init__.py
-│       ├── logger.py           # 日志配置
-│       └── alert.py            # 告警通知
+│   │   ├── __init__.py
+│   │   ├── logger.py           # 日志配置
+│   │   └── alert.py            # 告警通知
+│   └── docs/                   # 工具模块
+│       └── debug_page.png      # 反爬截图
 ├── data/                       # 数据目录（自动生成）
 ├── logs/                       # 日志目录（自动生成）
 ├── tests/                      # 测试脚本
