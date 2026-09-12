@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 抖音热点监控 Agent - 主入口
-用途：当运行 python main.py 时，启动一个完整的采集-处理-存储流程
+用途：当运行 python main.py 时，启动定时调度器，周期性采集抖音视频
 """
 
 import asyncio
@@ -17,54 +17,45 @@ from src.collector.douyin import DouyinCollector
 from src.storage.db import Database
 from src.storage.models import Video
 from src.utils.logger import get_logger
+from src.scheduler.tasks import TaskManager          # ✅ 新增：导入调度器
 
-# 初始化日志记录器
 logger = get_logger(__name__)
 
 
+# ============================================================
+# 【保留】原有的一次性采集函数（手动运行 / 调试用）
+# ============================================================
 async def run_collector():
     """
     核心流程：采集 -> 存储 -> 记录日志
-    这是整个 Agent 最核心的"采集-存储"链路
+    一次性执行，采集完就退出（调试用）
     """
     print("\n" + "=" * 60)
-    print("🎬 抖音热点监控 Agent 启动")
+    print("🎬 抖音热点监控 Agent 启动（一次性模式）")
     print("=" * 60 + "\n")
 
-    # 1. 初始化数据库
-    logger.info("📁 正在连接数据库...")
     db = Database("data/videos.db")
     logger.info("✅ 数据库连接成功")
 
-    # 2. 配置要监控的抖音用户 ID
-    # 注意：这里的 user_id 是抖音用户的唯一标识，需要替换成实际要监控的账号
-    # 可以从抖音分享链接中获取，例如：https://www.douyin.com/user/MS4wLjABAAAA...
     TARGET_USERS = [
-        "MS4wLjABAAAAAGH3WlHt9Zk1TjNQ6wL2fA",  # 示例用户1（请替换为真实ID）
-        # "MS4wLjABAAAA...",  # 可以添加多个用户，每行一个
+        "MS4wLjABAAAAzzufDZVJO_X8I8YnKTd5m3YmRY2LI9CQ0VTqEqRLUY4",
     ]
 
-    # 3. 创建采集器
     collector = DouyinCollector()
 
-    # 4. 遍历每个用户，进行采集
     for user_id in TARGET_USERS:
         print(f"\n📡 正在采集用户: {user_id}")
         logger.info(f"开始采集用户: {user_id}")
 
         try:
-            # 调用采集模块，获取视频列表
             videos_data = await collector.get_user_videos(user_id, limit=5)
             logger.info(f"采集到 {len(videos_data)} 条视频")
 
-            # 5. 将采集到的数据存入数据库
             for item in videos_data:
-                # 从采集结果中提取视频ID（从URL中解析）
                 video_id = item.get('url', '').split('/')[-1]
                 if not video_id:
                     video_id = f"video_{hash(item.get('url', ''))}"
 
-                # 创建 Video 对象
                 video = Video(
                     id=video_id,
                     user_id=user_id,
@@ -73,39 +64,79 @@ async def run_collector():
                     cover_url=item.get('cover_url', ''),
                     processed=False
                 )
-
-                # 存入数据库
                 db.insert_video(video)
                 logger.info(f"✅ 已存储视频: {video_id}")
 
             print(f"✅ 用户 {user_id} 采集完成，共存储 {len(videos_data)} 条视频")
 
         except Exception as e:
-            # 如果某个用户采集失败，记录错误但不中断程序
             error_msg = f"采集用户 {user_id} 失败: {e}"
             logger.error(error_msg)
             print(f"❌ {error_msg}")
-            # 记录到任务日志
             db.log_task(f"collect_{user_id}", "failed", error_msg)
 
-    # 6. 打印最终统计
+    print("\n✅ Agent 一次性运行完成！")
+
+
+# ============================================================
+# ✅ 新增：常驻调度模式（定时采集，正式运行用）
+# ============================================================
+async def run_scheduler():
+    """
+    启动定时调度器，程序常驻运行
+    每 2 小时自动采集一次指定账号的最新视频
+    """
     print("\n" + "=" * 60)
-    print("📊 本次运行统计")
-    print("=" * 60)
-    all_videos = db.get_all_videos(limit=10)
-    print(f"📦 数据库中现有视频总数: {len(all_videos)} 条")
-    print("\n📋 最新 5 条记录:")
-    for idx, v in enumerate(all_videos[:5], 1):
-        print(f"  {idx}. {v.get('title', '无标题')[:30]}... ({v.get('created_at', '')})")
-    
-    print("\n✅ Agent 运行完成！")
-    print("=" * 60)
+    print("⏰ 抖音热点监控 Agent 启动（定时调度模式）")
+    print("=" * 60 + "\n")
+
+    # 配置要监控的抖音用户 ID（请替换为真实 ID）
+    TARGET_USERS = [
+        "MS4wLjABAAAAAGH3WlHt9Zk1TjNQ6wL2fA",
+    ]
+
+    # 创建调度器并启动
+    tm = TaskManager()
+    tm.schedule_monitor(TARGET_USERS)
+    logger.info("✅ 定时调度器已启动，每 2 小时采集一次")
+    print("✅ 定时调度器已启动，每 2 小时采集一次")
+    print("💡 按 Ctrl+C 退出程序\n")
+
+    # 保持程序常驻运行，否则 asyncio.run 会立即退出
+    try:
+        while True:
+            await asyncio.sleep(3600)   # 每小时检查一次，避免 CPU 空转
+    except KeyboardInterrupt:
+        print("\n⏹️ 收到退出信号，正在清理资源......")
+        tm.scheduler.shutdown()
+      
+        # ✅ 优雅关闭浏览器
+        try:
+            await tm.collector.stop()
+        except Exception as e:
+            logger.error(f"关闭浏览器失败: {e}")
+
+        print("✅ 已安全退出")
+        # 给 asyncio 一点时间清理
+        await asyncio.sleep(1)
 
 
+# ============================================================
+# 【改动】主入口：改成启动调度器
+# ============================================================
 def main():
     """程序入口"""
     try:
-        asyncio.run(run_collector())
+        # ❌ 原来（一次性采集）：
+        # asyncio.run(run_collector())
+
+        # ✅ 现在（定时调度，常驻运行）：
+        asyncio.run(run_scheduler())
+
+        # 如果你只想调试一次性采集，把上面那行注释掉，
+        # 改成下面这行：
+        # asyncio.run(run_collector())
+
     except KeyboardInterrupt:
         print("\n\n⏹️ 用户中断，程序已停止")
     except Exception as e:

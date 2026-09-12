@@ -5,6 +5,7 @@ __pycache__/
 
 # 虚拟环境
 venv/
+.ipynb_checkpoints/
 env/
 .venv/
 
