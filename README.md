@@ -59,7 +59,7 @@ douyin-monitor/
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/你的用户名/douyin-monitor.git
+git clone https://github.com/xieyn9988/douyin-monitor.git
 cd douyin-monitor
 
 # 2. 创建虚拟环境
