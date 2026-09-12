@@ -151,7 +151,8 @@ douyin-monitor/
 | test_db.py | 数据库读写是否正常 | python tests/test_db.py |
 | test_phase1.py | 集成测试（采集 → 存储） | python tests/test_phase1.py |
 
-**运行前请确保已完成「快速开始」中的环境安装步骤。**
+*--运行前请确保已完成「快速开始」中的环境安装步骤--*
+
 ---
 
 ## 数据库设计
