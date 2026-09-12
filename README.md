@@ -298,9 +298,9 @@ douyin-monitor/
 
 ## 联系方式
 
-- 项目维护者：[Your Name]
-- 邮箱：[your-email@example.com]
-- GitHub：https://github.com/your-username
+- 项目维护者：[谢鹰]
+- 邮箱：[420309519@qq.com]
+- GitHub：https://github.com/xieyn9988
 
 ---
 
