@@ -193,21 +193,26 @@ douyin-monitor/
 
 核心逻辑是使用 Playwright 启动浏览器，模拟真实用户访问抖音页面：
 
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        context = await browser.new_context(
-            user_agent=random.choice(self.user_agents),
-            viewport={'width': 1920, 'height': 1080}
-        )
-        page = await context.new_page()
-        await page.goto(url, timeout=30000)
-        await page.wait_for_timeout(random.randint(2000, 4000))
+    # 初始化（只执行一次）
+    collector = DouyinCollector()
+    await collector.start()   # 启动 Playwright 和浏览器，创建 context
+
+    # 每次采集时（复用同一个 context，只开新 page）
+    page = await self.context.new_page()
+    await page.goto(url, timeout=30000)
+    await page.wait_for_timeout(random.randint(2000, 4000))
+
+    # 采集完成后
+    await page.close()        # 关页面，不关浏览器
+    # 说明：浏览器只在启动时创建一次，后续每次采集复用同一个 context，仅新建 page，大幅降低资源消耗。
+        
 
 反爬策略：
 
-- User-Agent 轮换，模拟不同设备
-- 随机延迟，避免请求频率过高
-- 模拟鼠标滚动，触发懒加载
+- **User-Agent 轮换**：每次启动浏览器时随机选择一个 UA，模拟不同设备
+- **随机延迟**：页面加载后随机等待 2~4 秒，避免请求频率过高被识别
+- **模拟真实交互**：通过 `mouse.wheel` 模拟鼠标滚动，触发页面懒加载
+- **复用浏览器上下文**：避免频繁启动/关闭浏览器留下明显特征
 
 ### 2. 任务调度与重试
 
