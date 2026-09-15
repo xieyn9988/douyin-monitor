@@ -245,14 +245,19 @@ douyin-monitor/
 ### docker-compose.yml
 
     version: '3.8'
+    # 本项目只有一个名为 monitor 的服务。
     services:
       monitor:
         build: .
+        # ${FEISHU_WEBHOOK} 会读取宿主机上同名的环境变量（通常在 .env 文件中定义，或通过 export 设置）。
+        # 注意：如果宿主机没有设置这个变量，容器内该变量会为空，可能会导致程序运行异常。
         environment:
           - FEISHU_WEBHOOK=${FEISHU_WEBHOOK}
         volumes:
           - ./data:/app/data
           - ./logs:/app/logs
+          # 用于缓存音频文件（避免重复下载或生成）
+          - ./audio_cache:/app/audio_cache
         restart: unless-stopped
 
 ---
